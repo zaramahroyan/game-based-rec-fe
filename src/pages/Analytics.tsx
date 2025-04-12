@@ -1,0 +1,422 @@
+
+import React from 'react';
+import PageLayout from '@/components/layout/PageLayout';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { 
+  BarChart, 
+  Bar, 
+  LineChart, 
+  Line, 
+  PieChart, 
+  Pie, 
+  Cell, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  Legend, 
+  ResponsiveContainer,
+  AreaChart,
+  Area
+} from 'recharts';
+import {
+  Calendar,
+  UserCheck,
+  TrendingUp,
+  PieChart as PieChartIcon,
+  BarChart3,
+  LineChart as LineChartIcon,
+  Download,
+  Filter,
+  Search,
+  Award
+} from 'lucide-react';
+
+// Mock data for charts
+const monthlyCompletionData = [
+  { name: 'Jan', completed: 5, pending: 2 },
+  { name: 'Feb', completed: 8, pending: 3 },
+  { name: 'Mar', completed: 6, pending: 1 },
+  { name: 'Apr', completed: 12, pending: 4 },
+  { name: 'May', completed: 9, pending: 2 },
+  { name: 'Jun', completed: 11, pending: 3 },
+];
+
+const personalityDistributionData = [
+  { name: 'INTJ', value: 15 },
+  { name: 'ENFP', value: 25 },
+  { name: 'ISTJ', value: 20 },
+  { name: 'ESFJ', value: 18 },
+  { name: 'Other', value: 22 },
+];
+
+const skillsDistributionData = [
+  { name: 'Problem Solving', candidates: 65 },
+  { name: 'Communication', candidates: 55 },
+  { name: 'Leadership', candidates: 40 },
+  { name: 'Critical Thinking', candidates: 70 },
+  { name: 'Teamwork', candidates: 60 },
+];
+
+const assessmentTrendsData = [
+  { month: 'Jan', assessments: 20, completion: 75 },
+  { month: 'Feb', assessments: 25, completion: 70 },
+  { month: 'Mar', assessments: 30, completion: 80 },
+  { month: 'Apr', assessments: 22, completion: 85 },
+  { month: 'May', assessments: 28, completion: 78 },
+  { month: 'Jun', assessments: 35, completion: 82 },
+];
+
+// Top personality traits data
+const personalityTraitsData = [
+  { trait: 'Introversion (I)', percentage: 65 },
+  { trait: 'Intuition (N)', percentage: 55 },
+  { trait: 'Thinking (T)', percentage: 70 },
+  { trait: 'Judging (J)', percentage: 45 },
+];
+
+// Colors for charts
+const COLORS = ['#8B5CF6', '#D946EF', '#F97316', '#0EA5E9', '#10B981'];
+
+const Analytics: React.FC = () => {
+  return (
+    <PageLayout>
+      <div className="container py-10">
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
+            <p className="text-gray-500">
+              Track candidate performance and assessment metrics
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <Button variant="outline" size="sm">
+              <Calendar className="h-4 w-4 mr-2" />
+              Last 6 months
+            </Button>
+            <Button variant="outline" size="sm">
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
+          </div>
+        </div>
+
+        {/* KPI Cards */}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5 mb-8">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Total Candidates</p>
+                  <div className="flex items-baseline mt-1">
+                    <p className="text-2xl font-bold">24</p>
+                    <p className="ml-2 text-xs font-medium text-emerald-500">+4</p>
+                  </div>
+                </div>
+                <div className="rounded-lg p-2 bg-recruiter-accent text-recruiter-primary">
+                  <UserCheck className="h-5 w-5" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Assessments Completed</p>
+                  <div className="flex items-baseline mt-1">
+                    <p className="text-2xl font-bold">18</p>
+                    <p className="ml-2 text-xs font-medium text-emerald-500">+2</p>
+                  </div>
+                </div>
+                <div className="rounded-lg p-2 bg-emerald-100 text-emerald-600">
+                  <Calendar className="h-5 w-5" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Avg. Completion Rate</p>
+                  <div className="flex items-baseline mt-1">
+                    <p className="text-2xl font-bold">75%</p>
+                    <p className="ml-2 text-xs font-medium text-emerald-500">+5%</p>
+                  </div>
+                </div>
+                <div className="rounded-lg p-2 bg-amber-100 text-amber-600">
+                  <TrendingUp className="h-5 w-5" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Most Common Trait</p>
+                  <div className="flex items-baseline mt-1">
+                    <p className="text-2xl font-bold">Introversion</p>
+                  </div>
+                </div>
+                <div className="rounded-lg p-2 bg-violet-100 text-violet-600">
+                  <PieChartIcon className="h-5 w-5" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Avg. Assessment Score</p>
+                  <div className="flex items-baseline mt-1">
+                    <p className="text-2xl font-bold">82%</p>
+                    <p className="ml-2 text-xs font-medium text-emerald-500">+3%</p>
+                  </div>
+                </div>
+                <div className="rounded-lg p-2 bg-blue-100 text-blue-600">
+                  <Award className="h-5 w-5" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Tabs for different views */}
+        <Tabs defaultValue="overview" className="mb-8">
+          <TabsList className="grid w-full md:w-auto grid-cols-3 mb-8">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="candidates">Candidates</TabsTrigger>
+            <TabsTrigger value="assessments">Assessments</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="overview">
+            <div className="grid gap-8 md:grid-cols-2">
+              {/* Assessment Completion Trends */}
+              <Card className="md:col-span-2">
+                <CardHeader>
+                  <CardTitle>Assessment Completion Trends</CardTitle>
+                  <CardDescription>Monthly assessment completions and pending assessments</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={monthlyCompletionData}
+                        margin={{
+                          top: 20,
+                          right: 30,
+                          left: 20,
+                          bottom: 5,
+                        }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="completed" stackId="a" fill="#8B5CF6" name="Completed" />
+                        <Bar dataKey="pending" stackId="a" fill="#D946EF" name="Pending" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              {/* Personality Distribution */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Personality Distribution</CardTitle>
+                  <CardDescription>Distribution of personality types among candidates</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={personalityDistributionData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={90}
+                          fill="#8884d8"
+                          paddingAngle={2}
+                          dataKey="value"
+                          label
+                        >
+                          {personalityDistributionData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              {/* Skills Distribution */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Skills Distribution</CardTitle>
+                  <CardDescription>Top skills among candidates</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        layout="vertical"
+                        data={skillsDistributionData}
+                        margin={{
+                          top: 20,
+                          right: 30,
+                          left: 70,
+                          bottom: 5,
+                        }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis type="number" />
+                        <YAxis dataKey="name" type="category" />
+                        <Tooltip />
+                        <Bar dataKey="candidates" fill="#0EA5E9" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="candidates">
+            <div className="grid gap-8 md:grid-cols-2">
+              {/* Personality Distribution */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Personality Traits</CardTitle>
+                  <CardDescription>Top personality traits among candidates</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {personalityTraitsData.map((trait, index) => (
+                      <div key={index}>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm font-medium">{trait.trait}</span>
+                          <span className="text-sm">{trait.percentage}%</span>
+                        </div>
+                        <Progress value={trait.percentage} className="h-2" />
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+              
+              {/* Candidate Growth */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Candidate Growth</CardTitle>
+                  <CardDescription>Monthly candidate registration trends</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart
+                        data={assessmentTrendsData}
+                        margin={{
+                          top: 10,
+                          right: 30,
+                          left: 0,
+                          bottom: 0,
+                        }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="month" />
+                        <YAxis />
+                        <Tooltip />
+                        <Area type="monotone" dataKey="assessments" stroke="#8B5CF6" fill="#8B5CF6" fillOpacity={0.3} />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="assessments">
+            <div className="grid gap-8 md:grid-cols-2">
+              {/* Assessment Completion Rate */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Assessment Completion Rate</CardTitle>
+                  <CardDescription>Monthly completion rate trends</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart
+                        data={assessmentTrendsData}
+                        margin={{
+                          top: 5,
+                          right: 30,
+                          left: 20,
+                          bottom: 5,
+                        }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="month" />
+                        <YAxis />
+                        <Tooltip />
+                        <Line type="monotone" dataKey="completion" stroke="#10B981" activeDot={{ r: 8 }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              {/* Assessment Volume */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Assessment Volume</CardTitle>
+                  <CardDescription>Monthly assessment volume trends</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart
+                        data={assessmentTrendsData}
+                        margin={{
+                          top: 5,
+                          right: 30,
+                          left: 20,
+                          bottom: 5,
+                        }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="month" />
+                        <YAxis />
+                        <Tooltip />
+                        <Line type="monotone" dataKey="assessments" stroke="#F97316" activeDot={{ r: 8 }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </PageLayout>
+  );
+};
+
+export default Analytics;
