@@ -30,7 +30,7 @@ const Index = () => {
                 <Button asChild size="lg" className="bg-white text-candidate-primary hover:bg-gray-100">
                   <Link to="/signup">Get Started</Link>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="text-white border-white hover:bg-white/10">
+                <Button asChild size="lg"  className="bg-white text-candidate-primary hover:bg-gray-100">
                   <Link to="/login">Sign In</Link>
                 </Button>
               </div>

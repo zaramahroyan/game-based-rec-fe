@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { Brain, Clock, PlayCircle, CheckCircle2 } from 'lucide-react';
+import { Brain, Clock, PlayCircle, CheckCircle2, Gamepad2 } from 'lucide-react';
 
 // Mock data for modules - moved from CandidateDashboard
 const assessmentModules = [
@@ -16,7 +16,8 @@ const assessmentModules = [
     duration: '25 mins',
     progress: 0,
     status: 'not_started',
-    icon: Brain,
+    icon: Gamepad2,
+    isUnity: true,
   },
   {
     id: 2,
@@ -26,6 +27,7 @@ const assessmentModules = [
     progress: 65,
     status: 'in_progress',
     icon: Brain,
+    isUnity: false,
   },
   {
     id: 3,
@@ -35,18 +37,19 @@ const assessmentModules = [
     progress: 100,
     status: 'completed',
     icon: Brain,
+    isUnity: false,
   },
 ];
 
 const Assessments: React.FC = () => {
-  const getModuleStatusElement = (status: string, progress: number) => {
+  const getModuleStatusElement = (status: string, progress: number, isUnity: boolean) => {
     switch (status) {
       case 'not_started':
         return (
           <Button asChild>
             <Link to={`/assessment/1`} className="inline-flex items-center">
               <PlayCircle className="mr-2 h-4 w-4" />
-              Start
+              {isUnity ? 'Start Game' : 'Start'}
             </Link>
           </Button>
         );
@@ -60,7 +63,7 @@ const Assessments: React.FC = () => {
             <Progress value={progress} className="h-2" />
             <Button asChild variant="outline" size="sm" className="mt-2 w-full">
               <Link to={`/assessment/2`}>
-                Continue
+                Continue {isUnity && 'Game'}
               </Link>
             </Button>
           </div>
@@ -96,11 +99,27 @@ const Assessments: React.FC = () => {
         
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {assessmentModules.map((module) => (
-            <Card key={module.id} className={`game-card candidate-card ${module.status === 'completed' ? 'border-emerald-200' : module.status === 'in_progress' ? 'border-amber-200' : ''}`}>
+            <Card 
+              key={module.id} 
+              className={`game-card candidate-card ${
+                module.status === 'completed' 
+                  ? 'border-emerald-200' 
+                  : module.status === 'in_progress' 
+                    ? 'border-amber-200' 
+                    : ''
+              } ${
+                module.isUnity ? 'relative overflow-hidden' : ''
+              }`}
+            >
+              {module.isUnity && (
+                <div className="absolute top-0 right-0 bg-blue-500 text-white px-2 py-1 text-xs font-medium rounded-bl">
+                  Unity Game
+                </div>
+              )}
               <CardContent className="p-6">
                 <div className="flex justify-between items-start mb-4">
-                  <div className="h-10 w-10 rounded-lg bg-candidate-accent flex items-center justify-center">
-                    <module.icon className="h-5 w-5 text-candidate-primary" />
+                  <div className={`h-10 w-10 rounded-lg ${module.isUnity ? 'bg-blue-100 text-blue-600' : 'bg-candidate-accent text-candidate-primary'} flex items-center justify-center`}>
+                    <module.icon className="h-5 w-5" />
                   </div>
                   <div className="flex items-center text-sm text-gray-500">
                     <Clock className="mr-1 h-4 w-4" />
@@ -109,7 +128,7 @@ const Assessments: React.FC = () => {
                 </div>
                 <h3 className="text-xl font-semibold mb-2">{module.title}</h3>
                 <p className="text-gray-600 mb-6 text-sm">{module.description}</p>
-                {getModuleStatusElement(module.status, module.progress)}
+                {getModuleStatusElement(module.status, module.progress, module.isUnity)}
               </CardContent>
             </Card>
           ))}

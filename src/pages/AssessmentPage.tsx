@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PageLayout from '@/components/layout/PageLayout';
@@ -9,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { ArrowLeft, ArrowRight, Save, AlertCircle } from 'lucide-react';
+import UnityAssessment from '@/components/unity/UnityAssessment';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -144,6 +144,7 @@ const AssessmentPage: React.FC = () => {
   const [progress, setProgress] = useState(0);
   const [exitDialogOpen, setExitDialogOpen] = useState(false);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [useUnityInterface, setUseUnityInterface] = useState(true);
   
   useEffect(() => {
     // In a real app, fetch assessment data from API
@@ -151,7 +152,9 @@ const AssessmentPage: React.FC = () => {
     if (data) {
       setAssessment(data);
       // Initialize progress based on number of questions
-      updateProgress(0, data.questions.length);
+      if (!useUnityInterface) {
+        updateProgress(0, data.questions.length);
+      }
     } else {
       toast({
         title: 'Assessment not found',
@@ -160,13 +163,7 @@ const AssessmentPage: React.FC = () => {
       });
       navigate('/candidate-dashboard');
     }
-  }, [assessmentId, navigate]);
-  
-  useEffect(() => {
-    if (assessment) {
-      updateProgress(currentQuestionIndex, assessment.questions.length);
-    }
-  }, [currentQuestionIndex, assessment]);
+  }, [assessmentId, navigate, useUnityInterface]);
   
   const updateProgress = (current: number, total: number) => {
     const progressPercentage = Math.round((current / total) * 100);
@@ -226,6 +223,35 @@ const AssessmentPage: React.FC = () => {
       setSaveDialogOpen(true);
     }
   };
+
+  const handleUnityProgress = (progressValue: number) => {
+    setProgress(progressValue);
+  };
+
+  const handleUnityComplete = (unityAnswers: Record<number, string>) => {
+    // Handle completion from Unity
+    setAnswers(unityAnswers);
+    
+    toast({
+      title: 'Assessment Completed',
+      description: 'Your Unity assessment has been completed successfully.',
+    });
+    
+    // Navigate to results page
+    setTimeout(() => {
+      navigate(`/results/${assessmentId}`);
+    }, 1500);
+  };
+
+  const handleUnitySaveProgress = (unityAnswers: Record<number, string>) => {
+    // Save progress from Unity
+    setAnswers(unityAnswers);
+    
+    toast({
+      title: 'Progress Saved',
+      description: 'Your Unity assessment progress has been saved successfully.',
+    });
+  };
   
   if (!assessment) {
     return (
@@ -236,11 +262,6 @@ const AssessmentPage: React.FC = () => {
       </PageLayout>
     );
   }
-  
-  const currentQuestion = assessment.questions[currentQuestionIndex];
-  const isLastQuestion = currentQuestionIndex === assessment.questions.length - 1;
-  const isFirstQuestion = currentQuestionIndex === 0;
-  const hasAnsweredCurrent = answers[currentQuestion.id] !== undefined;
   
   return (
     <PageLayout>
@@ -263,81 +284,94 @@ const AssessmentPage: React.FC = () => {
             </div>
           </div>
           
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span>Question {currentQuestionIndex + 1} of {assessment.questions.length}</span>
-              <span>{progress}% Complete</span>
-            </div>
-            <Progress value={progress} className="h-2" />
-          </div>
-        </div>
-        
-        <Card className="mb-8 overflow-hidden border-2 animation-fade-in">
-          <div className="bg-gradient-to-r from-candidate-primary to-candidate-secondary p-6 text-white">
-            <h3 className="text-xl font-medium mb-2">Scenario:</h3>
-            <p>{currentQuestion.scenario}</p>
-          </div>
-          <CardContent className="p-6">
-            <h3 className="text-lg font-medium mb-4">{currentQuestion.question}</h3>
-            
-            <RadioGroup
-              value={answers[currentQuestion.id]}
-              onValueChange={(value) => handleAnswer(currentQuestion.id, value)}
-              className="space-y-4"
-            >
-              {currentQuestion.options.map((option) => (
-                <div
-                  key={option.id}
-                  className={`flex items-start space-x-2 rounded-lg border p-4 transition-all ${
-                    answers[currentQuestion.id] === option.id
-                      ? 'border-candidate-primary bg-candidate-accent'
-                      : 'hover:border-gray-300 hover:bg-gray-50'
-                  }`}
-                >
-                  <RadioGroupItem
-                    value={option.id}
-                    id={`option-${option.id}`}
-                    className="mt-1"
-                  />
-                  <Label
-                    htmlFor={`option-${option.id}`}
-                    className="flex-1 cursor-pointer text-base"
-                  >
-                    {option.text}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
-            
-            {!hasAnsweredCurrent && (
-              <div className="mt-4 flex items-center p-4 text-amber-600 bg-amber-50 rounded-lg">
-                <AlertCircle className="h-5 w-5 mr-2" />
-                <p className="text-sm">Please select an answer to continue</p>
+          {!useUnityInterface && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span>Question {currentQuestionIndex + 1} of {assessment.questions.length}</span>
+                <span>{progress}% Complete</span>
               </div>
-            )}
-          </CardContent>
-        </Card>
-        
-        <div className="flex justify-between">
-          <Button
-            variant="outline"
-            onClick={handlePreviousQuestion}
-            disabled={isFirstQuestion}
-            className={!isFirstQuestion ? 'animate-fade-in' : ''}
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Previous
-          </Button>
-          
-          <Button
-            onClick={handleNextQuestion}
-            disabled={!hasAnsweredCurrent}
-            className={hasAnsweredCurrent ? 'animate-fade-in' : ''}
-          >
-            {isLastQuestion ? 'Finish' : 'Next'}
-            {!isLastQuestion && <ArrowRight className="ml-2 h-4 w-4" />}
-          </Button>
+              <Progress value={progress} className="h-2" />
+            </div>
+          )}
         </div>
+        
+        {useUnityInterface ? (
+          <UnityAssessment 
+            assessmentId={assessmentId || '1'} 
+            onProgress={handleUnityProgress}
+            onComplete={handleUnityComplete}
+            onSaveProgress={handleUnitySaveProgress}
+          />
+        ) : (
+          <>
+            <Card className="mb-8 overflow-hidden border-2 animation-fade-in">
+              <div className="bg-gradient-to-r from-candidate-primary to-candidate-secondary p-6 text-white">
+                <h3 className="text-xl font-medium mb-2">Scenario:</h3>
+                <p>{assessment.questions[currentQuestionIndex].scenario}</p>
+              </div>
+              <CardContent className="p-6">
+                <h3 className="text-lg font-medium mb-4">{assessment.questions[currentQuestionIndex].question}</h3>
+                
+                <RadioGroup
+                  value={answers[assessment.questions[currentQuestionIndex].id]}
+                  onValueChange={(value) => handleAnswer(assessment.questions[currentQuestionIndex].id, value)}
+                  className="space-y-4"
+                >
+                  {assessment.questions[currentQuestionIndex].options.map((option: any) => (
+                    <div
+                      key={option.id}
+                      className={`flex items-start space-x-2 rounded-lg border p-4 transition-all ${
+                        answers[assessment.questions[currentQuestionIndex].id] === option.id
+                          ? 'border-candidate-primary bg-candidate-accent'
+                          : 'hover:border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      <RadioGroupItem
+                        value={option.id}
+                        id={`option-${option.id}`}
+                        className="mt-1"
+                      />
+                      <Label
+                        htmlFor={`option-${option.id}`}
+                        className="flex-1 cursor-pointer text-base"
+                      >
+                        {option.text}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+                
+                {!answers[assessment.questions[currentQuestionIndex].id] && (
+                  <div className="mt-4 flex items-center p-4 text-amber-600 bg-amber-50 rounded-lg">
+                    <AlertCircle className="h-5 w-5 mr-2" />
+                    <p className="text-sm">Please select an answer to continue</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            
+            <div className="flex justify-between">
+              <Button
+                variant="outline"
+                onClick={handlePreviousQuestion}
+                disabled={currentQuestionIndex === 0}
+                className={currentQuestionIndex !== 0 ? 'animate-fade-in' : ''}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Previous
+              </Button>
+              
+              <Button
+                onClick={handleNextQuestion}
+                disabled={!answers[assessment.questions[currentQuestionIndex].id]}
+                className={answers[assessment.questions[currentQuestionIndex].id] ? 'animate-fade-in' : ''}
+              >
+                {currentQuestionIndex === assessment.questions.length - 1 ? 'Finish' : 'Next'}
+                {currentQuestionIndex !== assessment.questions.length - 1 && <ArrowRight className="ml-2 h-4 w-4" />}
+              </Button>
+            </div>
+          </>
+        )}
         
         {/* Exit Dialog */}
         <AlertDialog open={exitDialogOpen} onOpenChange={setExitDialogOpen}>
